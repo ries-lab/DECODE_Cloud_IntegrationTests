@@ -1,0 +1,13 @@
+name: decode_cloud_integration_tests
+
+channels:
+  - turagalab
+  - pytorch
+  - conda-forge
+
+dependencies:
+  - decode=0.10.2
+  - pytest
+  - pytest-ordering
+  - python-dotenv
+  - pyyaml
