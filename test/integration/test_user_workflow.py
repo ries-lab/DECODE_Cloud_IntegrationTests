@@ -57,9 +57,14 @@ def experiment_unique_id():
 
 
 @pytest.fixture(scope="module")
-def job_id(experiment_unique_id, headers):
+def job_name(experiment_unique_id):
+    return f"integration_test_job_{experiment_unique_id}"
+
+
+@pytest.fixture(scope="module")
+def job_id(experiment_unique_id, job_name, headers):
     params = {
-        "job_name": f"integration_test_job_{experiment_unique_id}",
+        "job_name": job_name,
         "environment": ENVIRONMENT,
         "priority": 0,
         "application": {
@@ -190,9 +195,9 @@ def test_job_finished(job_id, headers):
 
 
 @pytest.mark.order9
-def test_download(job_id, headers, params_path):
+def test_download(job_name, headers, params_path):
     resp = requests.get(
-        f"{API_URL}/files/artifact/{job_id}/",
+        f"{API_URL}/files/artifact/{job_name}/",
         params={"recursive": True},
         headers=headers,
     )
@@ -206,3 +211,9 @@ def test_download(job_id, headers, params_path):
     )
     model_paths = [p for p in paths if os.path.splitext(p)[-1] == ".pt"]
     assert len(model_paths) >= 1
+
+
+@pytest.mark.order10
+def test_cancel_job(job_id, headers):
+    resp = requests.delete(f"{API_URL}/jobs/{job_id}", headers=headers)
+    resp.raise_for_status()
