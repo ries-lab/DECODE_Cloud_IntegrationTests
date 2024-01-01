@@ -12,11 +12,20 @@ if not ID_TOKEN:
     email = os.getenv("EMAIL")
     pwd = os.getenv("PASSWORD")
     try:
-        resp = requests.post(f"{API_URL}/token", json={"email": email, "password": pwd})
+        resp = requests.post(
+            f"{API_URL}/token", data={"username": email, "password": pwd}
+        )
         resp.raise_for_status()
     except:
-        requests.post(f"{API_URL}/user", json={"email": email, "password": pwd, "groups": ["users"]})
-        resp = requests.post(f"{API_URL}/token", json={"email": email, "password": pwd})
+        resp = requests.post(
+            f"{API_URL}/user",
+            data={"username": email, "password": pwd, "groups": ["users"]},
+        )
+        resp.raise_for_status()
+        resp = requests.post(
+            f"{API_URL}/token", data={"username": email, "password": pwd}
+        )
+        resp.raise_for_status()
     ID_TOKEN = resp.json()["id_token"]
 
 DEVICE = os.getenv("DEVICE")
