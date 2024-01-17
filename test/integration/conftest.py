@@ -1,3 +1,4 @@
+import boto3
 import dotenv
 import os
 import requests
@@ -11,22 +12,16 @@ ID_TOKEN = os.getenv("ACCESS_TOKEN")
 if not ID_TOKEN:
     email = os.getenv("EMAIL")
     pwd = os.getenv("PASSWORD")
-    try:
-        resp = requests.post(
-            f"{API_URL}/token", data={"username": email, "password": pwd}
-        )
-        resp.raise_for_status()
-    except:
-        resp = requests.post(
-            f"{API_URL}/user",
-            data={"username": email, "password": pwd, "groups": ["users"]},
-        )
-        resp.raise_for_status()
-        resp = requests.post(
-            f"{API_URL}/token", data={"username": email, "password": pwd}
-        )
-        resp.raise_for_status()
-    ID_TOKEN = resp.json()["id_token"]
+
+    resp = requests.get(f"{API_URL}/access_info")
+    resp.raise_for_status()
+    access_info = resp.json()["cognito"]
+    cognito_client = boto3.client("cognito-idp", region_name=access_info["region"])
+    ID_TOKEN = cognito_client.initiate_auth(
+        AuthFlow="USER_PASSWORD_AUTH",
+        AuthParameters={"USERNAME": email, "PASSWORD": pwd},
+        ClientId=access_info["client_id"],
+    )["AuthenticationResult"]["IdToken"]
 
 DEVICE = os.getenv("DEVICE")
 ENVIRONMENT = os.getenv("ENVIRONMENT")

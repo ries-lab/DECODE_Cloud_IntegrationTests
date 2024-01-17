@@ -10,7 +10,7 @@ Integration tests for DECODE .
    * `API_URL`
    * `ID_TOKEN` to login, or `EMAIL` and `PASSWORD` if the user-facing API exposes endpoint `POST /token`
    * `DEVICE="cpu"` if the worker does not have a GPU
-   * `ENVIRONMENT="cloud"` if testing with a cloud worker
+   * `ENVIRONMENT="cloud"` if testing with a cloud worker, else `"local"`
 
 **Test flow**:
  * [Gets ID token to authenticate]
@@ -23,5 +23,5 @@ Integration tests for DECODE .
  * Waits at most 10 minutes for the status to be changed to `running`.
  * Waits at most 30 minutes for the status to be changed to `postprocessing`.
  * Waits at most 10 minutes for the status to be changed to `finished`.
- * Downloads the output `param_run_in.yaml`, checks that a `.pt` file is present in the output.
+ * Downloads the output `param_run_in.yaml` (2-step pre-signed url, get from pre-signed url), checks that a `.pt` file is present in the output.
  * Tries deleting the ran job (as a side-effect, cleaning up the test).

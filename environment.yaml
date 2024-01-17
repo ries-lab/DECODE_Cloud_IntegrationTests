@@ -6,6 +6,7 @@ channels:
   - conda-forge
 
 dependencies:
+  - boto3
   - decode=0.10.2
   - pytest
   - pytest-ordering

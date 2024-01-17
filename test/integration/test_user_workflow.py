@@ -166,35 +166,28 @@ def test_start_job(job_id, headers):
 
 
 @pytest.mark.order4
-def test_job_pulled(job_id, headers):
-    check_status_change(job_id, "pulled", headers, sleep_time=0.1, timeout=10 * 60)
+def test_job_preprocessing(job_id, headers):
+    check_status_change(job_id, "preprocessing", headers, sleep_time=5, timeout=10 * 60)
 
 
 @pytest.mark.order5
-def test_job_preprocessing(job_id, headers):
-    check_status_change(
-        job_id, "preprocessing", headers, sleep_time=30, timeout=10 * 60
-    )
+def test_job_running(job_id, headers):
+    check_status_change(job_id, "running", headers, sleep_time=5, timeout=10 * 60)
 
 
 @pytest.mark.order6
-def test_job_running(job_id, headers):
-    check_status_change(job_id, "running", headers, sleep_time=30, timeout=10 * 60)
-
-
-@pytest.mark.order7
 def test_job_postprocessing(job_id, headers):
     check_status_change(
-        job_id, "postprocessing", headers, sleep_time=30, timeout=30 * 60
+        job_id, "postprocessing", headers, sleep_time=5, timeout=30 * 60
     )
 
 
-@pytest.mark.order8
+@pytest.mark.order7
 def test_job_finished(job_id, headers):
-    check_status_change(job_id, "finished", headers, sleep_time=30, timeout=10 * 60)
+    check_status_change(job_id, "finished", headers, sleep_time=5, timeout=10 * 60)
 
 
-@pytest.mark.order9
+@pytest.mark.order8
 def test_download(job_name, headers, params_path):
     resp = requests.get(
         f"{API_URL}/files/artifact/{job_name}/",
@@ -213,7 +206,7 @@ def test_download(job_name, headers, params_path):
     assert len(model_paths) >= 1
 
 
-@pytest.mark.order10
+@pytest.mark.order9
 def test_cancel_job(job_id, headers):
     resp = requests.delete(f"{API_URL}/jobs/{job_id}", headers=headers)
     resp.raise_for_status()
