@@ -1,5 +1,5 @@
 # DECODE_Cloud_IntegrationTests
-Integration tests for DECODE OpenCloud.
+Integration tests for ![DECODE OpenCloud](https://github.com/ries-lab/DECODE_Cloud_Documentation).
 
 **Requires**:
  * Deployed backed (typically through `DECODE_AWS_Infrastructure`)
