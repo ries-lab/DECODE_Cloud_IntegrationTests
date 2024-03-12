@@ -1,5 +1,5 @@
 # DECODE_Cloud_IntegrationTests
-Integration tests for DECODE .
+Integration tests for DECODE OpenCloud.
 
 **Requires**:
  * Deployed backed (typically through `DECODE_AWS_Infrastructure`)
