@@ -1,11 +1,11 @@
 # DECODE_Cloud_IntegrationTests
-Integration tests for ![DECODE OpenCloud](https://github.com/ries-lab/DECODE_Cloud_Documentation).
+Integration tests for [DECODE OpenCloud](https://github.com/ries-lab/DECODE_Cloud_Documentation).
 
 **Requires**:
- * Deployed backed (typically through ![AWS infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
-   * ![User-facing](https://github.com/ries-lab/DECODE_Cloud_UserAPI) and ![worker-facing]((https://github.com/ries-lab/DECODE_Cloud_WorkerAPI)) APIs
-   * Worker pulling and working on jobs (e.g. cloud worker ![on AWS](https://github.com/ries-lab/DECODE_AWS_Infrastructure), or ![local worker](https://github.com/ries-lab/DECODE_Cloud_JobFetcher))
-   * Application `decode` with version `v0_10_1` and entrypoint `train` (see ![DECODE_AWS_Infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
+ * Deployed backed (typically through [AWS infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
+   * [User-facing](https://github.com/ries-lab/DECODE_Cloud_UserAPI) and [worker-facing]((https://github.com/ries-lab/DECODE_Cloud_WorkerAPI)) APIs
+   * Worker pulling and working on jobs (e.g. cloud worker [on AWS](https://github.com/ries-lab/DECODE_AWS_Infrastructure), or [local worker](https://github.com/ries-lab/DECODE_Cloud_JobFetcher))
+   * Application `decode` with version `v0_10_1` and entrypoint `train` (see [DECODE_AWS_Infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
  * Configuration (environment variables in `.env`)
    * `API_URL`
    * `ID_TOKEN` to login, or `EMAIL` and `PASSWORD` if the user-facing API exposes endpoint `POST /token`
