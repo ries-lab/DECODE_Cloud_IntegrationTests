@@ -10,22 +10,23 @@ package-mode = false
 python = "3.11.10"
 
 [tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+requests = "^2.32.3"
+mypy = "^1.14.0"
+pre-commit = "^4.0.1"
+boto3 = "^1.35.86"
+boto3-stubs = {extras = ["full"], version = "^1.35.86"}
+ruff = "^0.8.4"
+types-requests = "^2.32.0.20241016"
+types-boto3 = "^1.35.86"
+python-dotenv = "^1.0.1"
+python-on-whales = "^0.74.0"
+pytest-ordering = "^0.6"
+pyyaml = "^6.0.2"
 
 [build-system]
 requires = ["poetry-core=1.8.4"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-docker-build = "scripts.docker:build"
-docker-run = "scripts.docker:run"
-docker-stop = "scripts.docker:stop"
-docker-cleanup = "scripts.docker:cleanup"
-
-[tool.pytest.ini_options]
-markers = [
-    "aws: requires aws credentials"
-]
-addopts = "-m 'not aws'"
 
 [tool.ruff.lint]
 extend-select = ["I"]

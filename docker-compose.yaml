@@ -11,6 +11,7 @@ services:
       - 8000:8000
     volumes:
       - ~/.aws/credentials:/home/app/.aws/credentials
+    env_file: .env
     environment:
       - AUTH=1
       - FILESYSTEM=local
@@ -19,7 +20,7 @@ services:
       - USER_DATA_ROOT_PATH=./user_data
       - DATABASE_URL=sqlite:///./sql_app.db
       - DATABASE_SECRET=
-      - WORKERFACING_API_URL=http://localhost:8001
+      - WORKERFACING_API_URL=http://workerfacing-api:8001
       - INTERNAL_API_KEY_SECRET=not-secret
       - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
       - COGNITO_REGION=${COGNITO_REGION}
@@ -30,7 +31,7 @@ services:
       - EMAIL_SENDER_ADDRESS=
       - EMAIL_SENDER_API_KEY=
       - EMAIL_SENDER_SECRET_KEY=
-      - FRONTEND_URL="http://localhost:8080"
+      - FRONTEND_URL="http://frontend:8080"
 
   workerfacing-api:
     image: workerfacing-api:integration-tests
@@ -44,6 +45,7 @@ services:
       - 8001:8001
     volumes:
       - ~/.aws/credentials:/home/app/.aws/credentials
+    env_file: .env
     environment:
       - HOST=0.0.0.0
       - PORT=8001
@@ -57,7 +59,7 @@ services:
       - MAX_RETRIES=2
       - TIMEOUT_FAILURE=300
       - RETRY_DIFFERENT=1
-      - USERFACING_API_URL=http://localhost:8000
+      - USERFACING_API_URL=http://userfacing-api:8000
       - INTERNAL_API_KEY_SECRET=not-secret
       - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
       - COGNITO_REGION=${COGNITO_REGION}
@@ -72,8 +74,9 @@ services:
     restart: no
     ports:
       - 8080:8080
+    env_file: .env
     environment:
-      - API_URL=http://localhost:8000
+      - API_URL=http://userfacing-api:8000
 
   job-fetcher:
     image: job-fetcher:integration-tests
@@ -87,10 +90,11 @@ services:
       - ~/.aws/credentials:/home/app/.aws/credentials
       - /var/run/docker.sock:/var/run/docker.sock
       - ./job_fetcher_data:/data
+    env_file: .env
     environment:
-      - API_URL=http://localhost:8001
+      - API_URL=http://workerfacing-api:8001
       - ACCESS_TOKEN=${ACCESS_TOKEN:-}
-      - USERNAME=${USERNAME}
+      - USERNAME=${EMAIL}
       - PASSWORD=${PASSWORD}
       - PATH_BASE=/data
       - PATH_HOST_BASE=./job_fetcher_data
