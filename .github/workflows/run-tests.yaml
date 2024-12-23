@@ -71,6 +71,7 @@ jobs:
                 cd $PWD
                 mkdir ~/.aws
                 mkdir ./job_fetcher_data
+                ls -l -R ../
             - name: Run tests
               env:
                 AWS_ACCESS_KEY_ID: ${{ secrets.TESTS_AWS_ACCESS_KEY_ID }}
