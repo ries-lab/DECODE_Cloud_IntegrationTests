@@ -1655,6 +1655,17 @@ workspaces-web = ["types-boto3-workspaces-web (>=1.35.0,<1.36.0)"]
 xray = ["types-boto3-xray (>=1.35.0,<1.36.0)"]
 
 [[package]]
+name = "types-pyyaml"
+version = "6.0.12.20241221"
+description = "Typing stubs for PyYAML"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types_PyYAML-6.0.12.20241221-py3-none-any.whl", hash = "sha256:0657a4ff8411a030a2116a196e8e008ea679696b5b1a8e1a6aa8ebb737b34688"},
+    {file = "types_pyyaml-6.0.12.20241221.tar.gz", hash = "sha256:4f149aa893ff6a46889a30af4c794b23833014c469cc57cbc3ad77498a58996f"},
+]
+
+[[package]]
 name = "types-requests"
 version = "2.32.0.20241016"
 description = "Typing stubs for requests"
@@ -1730,4 +1741,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.10"
-content-hash = "7cceb6f24f7089b2de03f669f4452b14a2daab99339a68365a11aeb7d4549b08"
+content-hash = "3f7ed881d067e445de2d9798d04189339cf3bfa7488efded1bf409881fc3c439"

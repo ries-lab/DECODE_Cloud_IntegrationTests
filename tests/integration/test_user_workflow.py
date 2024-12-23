@@ -4,7 +4,7 @@ import datetime
 import os
 import time
 from io import BytesIO
-from typing import Literal
+from typing import Literal, cast
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -12,7 +12,7 @@ import pytest
 import requests
 import yaml
 
-from conftest import Environment
+from tests.integration.conftest import Environment
 
 
 @dataclasses.dataclass
@@ -25,7 +25,8 @@ class ApplicationSpecs:
 @dataclasses.dataclass
 class ApplicationFile:
     type: Literal["config", "data", "artifact", "output", "log"]
-    path: str
+    local_path: str
+    app_path: str
 
 
 class _TestApplicationWorkflow(abc.ABC):
@@ -36,7 +37,9 @@ class _TestApplicationWorkflow(abc.ABC):
 
     @pytest.fixture(scope="class")
     @abc.abstractmethod
-    def input_files(self) -> list[ApplicationFile]:
+    def input_files(
+        self, use_gpu: bool, tmp_path_factory: pytest.TempPathFactory
+    ) -> list[ApplicationFile]:
         raise NotImplementedError()
 
     @pytest.fixture(scope="class")
@@ -86,10 +89,10 @@ class _TestApplicationWorkflow(abc.ABC):
             f"{environment.userfacing_api_url}/jobs", json=params, headers=headers
         )
         resp.raise_for_status()
-        return resp.json()["id"]
+        return cast(str, resp.json()["id"])
 
     def upload_file(
-        self, api_url: str, base_path: str, file_path: str, headers: dict[str, str]
+        self, api_url: str, base_path: str, local_path: str, headers: dict[str, str]
     ) -> None:
         resp = requests.post(
             f"{api_url}/files/{base_path}/url",
@@ -98,7 +101,7 @@ class _TestApplicationWorkflow(abc.ABC):
         resp.raise_for_status()
         resp = requests.request(
             **resp.json(),
-            files={"file": (os.path.split(file_path)[-1], open(file_path, "rb"))},
+            files={"file": (os.path.split(local_path)[-1], open(local_path, "rb"))},
         )
         resp.raise_for_status()
 
@@ -114,10 +117,10 @@ class _TestApplicationWorkflow(abc.ABC):
         resp.raise_for_status()
         return resp.content
 
-    def get_status(self, api_url: str, job_id: str, headers: dict[str, str]):
+    def get_status(self, api_url: str, job_id: str, headers: dict[str, str]) -> str:
         resp = requests.get(f"{api_url}/jobs/{job_id}", headers=headers)
         resp.raise_for_status()
-        return resp.json()["status"]
+        return cast(str, resp.json()["status"])
 
     def check_status_change(
         self,
@@ -166,7 +169,7 @@ class _TestApplicationWorkflow(abc.ABC):
             self.upload_file(
                 environment.userfacing_api_url,
                 f"{file.type}/{experiment_unique_id}/",
-                file.path,
+                file.local_path,
                 headers,
             )
 
@@ -186,7 +189,7 @@ class _TestApplicationWorkflow(abc.ABC):
         resp.raise_for_status()
         paths = [f["path"] for f in resp.json()]
         for file in input_files:
-            assert f"{file.type}/{experiment_unique_id}/{file.path}" in paths
+            assert f"{file.type}/{experiment_unique_id}/{file.app_path}" in paths
 
     @pytest.mark.order3
     def test_start_job(
@@ -248,9 +251,8 @@ class _TestApplicationWorkflow(abc.ABC):
             timeout=10 * 60,
         )
 
-    @pytest.mark.order8
     @abc.abstractmethod
-    def test_download(
+    def check_output_files(
         self,
         environment: Environment,
         job_name: str,
@@ -258,6 +260,17 @@ class _TestApplicationWorkflow(abc.ABC):
         input_files: list[ApplicationFile],
     ) -> None:
         raise NotImplementedError()
+
+    @pytest.mark.order8
+    def test_download(
+        self,
+        environment: Environment,
+        job_name: str,
+        headers: dict[str, str],
+        input_files: list[ApplicationFile],
+    ) -> None:
+        # need to do it this way to keep order in subclasses
+        self.check_output_files(environment, job_name, headers, input_files)
 
     @pytest.mark.order9
     def test_cancel_job(
@@ -274,7 +287,7 @@ class TestDecodeStableWorkflow(_TestApplicationWorkflow):
     def application(self) -> ApplicationSpecs:
         return ApplicationSpecs(
             application="decode",
-            version="v_0_10_1",
+            version="v0_10_1",
             entrypoint="train",
         )
 
@@ -306,12 +319,17 @@ class TestDecodeStableWorkflow(_TestApplicationWorkflow):
             yaml.dump(params, f)
 
         return [
-            ApplicationFile(type="config", path=params_path),
-            ApplicationFile(type="data", path=calib_path),
+            ApplicationFile(
+                type="config", local_path=str(params_path), app_path="param_run_in.yaml"
+            ),
+            ApplicationFile(
+                type="data",
+                local_path=str(calib_path),
+                app_path="spline_calibration_3dcal.mat",
+            ),
         ]
 
-    @pytest.mark.order8
-    def test_download(
+    def check_output_files(
         self,
         environment: Environment,
         job_name: str,
@@ -329,7 +347,7 @@ class TestDecodeStableWorkflow(_TestApplicationWorkflow):
         content = self.download_file(environment.userfacing_api_url, path, headers)
         assert (
             yaml.safe_load(content)["Camera"]["baseline"]
-            == yaml.safe_load(open(input_files[0].path))["Camera"]["baseline"]
+            == yaml.safe_load(open(input_files[0].local_path))["Camera"]["baseline"]
         )
         model_paths = [p for p in paths if os.path.splitext(p)[-1] == ".pt"]
         assert len(model_paths) >= 1

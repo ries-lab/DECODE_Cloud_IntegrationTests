@@ -1,0 +1,101 @@
+name: Run tests
+
+on:
+    schedule:
+        - cron: '0 0 * * 0'  # weekly
+    dispatch:
+        inputs:
+            environment:
+                type: choice
+                description: 'Environment to run tests in'
+                default: 'production'
+                options:
+                - prod
+                - dev
+                - local
+            gpu:
+                type: boolean
+                description: 'Whether to run tests on a GPU'
+                default: false
+            cloud:
+                type: boolean
+                description: 'Whether to run tests with a cloud worker'
+                default: false
+            userfacing_api_branch:
+                type: string
+                description: 'User-facing API branch (if environment==local)'
+                default: 'main'
+            workerfacing_api_branch:
+                type: string
+                description: 'Worker-facing API branch (if environment==local)'
+                default: 'main'
+            jobfetcher_branch:
+                type: string
+                description: 'Jobfetcher branch (if environment==local)'
+                default: 'main'
+            frontend_branch:
+                type: string
+                description: 'Frontend branch (if environment==local)'
+                default: 'main'
+
+jobs:
+    run_tests:
+        runs-on: ubuntu-latest
+        timeout-minutes: 240
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install poetry
+              run: pipx install poetry
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.11.10'
+                cache: 'poetry'
+            - name: Install dependencies
+              run: poetry install
+            - name: Clone repositories and checkout branches
+              if: ${{ github.event_name == 'dispatch' }}
+              run: |
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserAPI.git ..
+                git clone https://github.com/ries-lab/DECODE_Cloud_WorkerAPI.git ..
+                git clone https://github.com/ries-lab/DECODE_Cloud_JobFetcher.git ..
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserFrontend.git ..
+                cd ../DECODE_Cloud_UserAPI
+                git checkout ${{ github.event.inputs.userfacing_api_branch }}
+                cd ../DECODE_Cloud_WorkerAPI
+                git checkout ${{ github.event.inputs.workerfacing_api_branch }}
+                cd ../DECODE_Cloud_JobFetcher
+                git checkout ${{ github.event.inputs.jobfetcher_branch }}
+                cd ../DECODE_Cloud_UserFrontend
+                git checkout ${{ github.event.inputs.frontend_branch }}
+            - name: Run tests
+              env:
+                COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+                COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
+                COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+                COGNITO_SECRET: ${{ secrets.COGNITO_SECRET }}
+                EMAIL: ${{ secrets.EMAIL }}
+                PASSWORD: ${{ secrets.PASSWORD }}
+                TEST_EMAIL: ${{ secrets.EMAIL }}
+                TEST_PASSWORD: ${{ secrets.PASSWORD }}
+              run: |
+                touch .env
+
+                if [ ${{ github.event_name == 'dispatch' }} ]; then
+                    if [ ${{ github.event.inputs.gpu }} == true ]; then
+                        GPU=--gpu
+                    else
+                        GPU=""
+                    fi
+                    if [ ${{ github.event.inputs.cloud }} == true ]; then
+                        CLOUD=--cloud
+                    else
+                        CLOUD=""
+                    fi
+                fi
+                ENVIRONMENT=--${{ github.event.inputs.environment }}
+
+                if [ ${{ github.event_name == 'schedule' }} ]; then
+                    poetry run pytest tests/ $ENVIRONMENT --cloud
+                    poetry run pytest tests/ $ENVIRONMENT --cloud --gpu
+                else
+                    poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD

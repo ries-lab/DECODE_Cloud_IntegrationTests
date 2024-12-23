@@ -1,7 +1,7 @@
 import dataclasses
 import os
 import time
-from typing import Any, Generator
+from typing import Any, Generator, cast
 
 import boto3
 import dotenv
@@ -40,14 +40,14 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
     elif dev:
         yield Environment(
             name="dev",
-            userfacing_api_url="https://dev.api.decode.arthur-jaques.de/",
-            workerfacing_api_url="https://dev.wapi.decode.arthur-jaques.de/",
+            userfacing_api_url="https://dev.api.decode.arthur-jaques.de",
+            workerfacing_api_url="https://dev.wapi.decode.arthur-jaques.de",
         )
     elif prod:
         yield Environment(
             name="prod",
-            userfacing_api_url="https://prod.api.decode.arthur-jaques.de/",
-            workerfacing_api_url="https://prod.wapi.decode.arthur-jaques.de/",
+            userfacing_api_url="https://prod.api.decode.arthur-jaques.de",
+            workerfacing_api_url="https://prod.wapi.decode.arthur-jaques.de",
         )
     else:
         raise RuntimeError("Python is broken ;)")
@@ -55,12 +55,12 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
 
 @pytest.fixture(scope="session")
 def use_gpu(pytestconfig: pytest.Config) -> bool:
-    return pytestconfig.getoption("gpu")
+    return cast(bool, pytestconfig.getoption("gpu"))
 
 
 @pytest.fixture(scope="session")
 def use_cloud(pytestconfig: pytest.Config, environment: Environment) -> bool:
-    ret = pytestconfig.getoption("cloud")
+    ret = cast(bool, pytestconfig.getoption("cloud"))
     if ret and environment.name == "local":
         raise ValueError("Cannot use --cloud with --local")
     return ret
@@ -83,4 +83,4 @@ def id_token(environment: Environment) -> str:
         AuthParameters={"USERNAME": email, "PASSWORD": pwd},
         ClientId=access_info["client_id"],
     )["AuthenticationResult"]["IdToken"]
-    return id_token
+    return cast(str, id_token)
