@@ -3,7 +3,7 @@ name: Run tests
 on:
     schedule:
         - cron: '0 0 * * 0'  # weekly
-    dispatch:
+    workflow_dispatch:
         inputs:
             environment:
                 type: choice
