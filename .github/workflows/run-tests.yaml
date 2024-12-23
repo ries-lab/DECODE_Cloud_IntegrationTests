@@ -7,7 +7,7 @@ on:
         inputs:
             environment:
                 type: choice
-                description: 'Environment to run tests in'
+                description: 'Environment'
                 default: 'production'
                 options:
                 - prod
@@ -15,11 +15,11 @@ on:
                 - local
             gpu:
                 type: boolean
-                description: 'Whether to run tests on a GPU'
+                description: 'Run job(s) on GPU'
                 default: false
             cloud:
                 type: boolean
-                description: 'Whether to run tests with a cloud worker'
+                description: 'Run job(s) with cloud worker'
                 default: false
             userfacing_api_branch:
                 type: string
