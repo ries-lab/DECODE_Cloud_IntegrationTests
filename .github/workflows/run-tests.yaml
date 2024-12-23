@@ -101,7 +101,7 @@ jobs:
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
                 if [ $ENVIRONMENT == "--local" ]; then
-                    docker-compose up -d
+                    docker compose up -d
                 fi
 
                 if [ ${{ github.event_name == 'schedule' }} ]; then
@@ -112,5 +112,5 @@ jobs:
                 fi
 
                 if [ $ENVIRONMENT == "--local"] ; then
-                    docker-compose down
+                    docker compose down
                 fi
