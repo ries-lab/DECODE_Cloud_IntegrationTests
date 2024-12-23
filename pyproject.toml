@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "integration-tests"
+version = "0.1.0"
+description = "Integration tests for DECODE OpenCloud."
+authors = ["Arthur Jaques <arthur.jaques@hispeed.ch>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.11.10"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+requests = "^2.32.3"
+mypy = "^1.14.0"
+pre-commit = "^4.0.1"
+boto3 = "^1.35.86"
+boto3-stubs = {extras = ["full"], version = "^1.35.86"}
+ruff = "^0.8.4"
+types-requests = "^2.32.0.20241016"
+types-boto3 = "^1.35.86"
+python-dotenv = "^1.0.1"
+python-on-whales = "^0.74.0"
+pytest-ordering = "^0.6"
+pyyaml = "^6.0.2"
+types-pyyaml = "^6.0.12.20241221"
+
+[build-system]
+requires = ["poetry-core=1.8.4"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.mypy]
+strict = true
