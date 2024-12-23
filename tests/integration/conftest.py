@@ -29,7 +29,8 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
         raise ValueError("You can only specify one of --local, --dev, or --prod")
 
     if local:
-        docker.compose.up(detach=True)
+        # docker.compose.up(detach=True)
+        os.system("docker-compose up -d")  # temp, see outputs
         time.sleep(30)  # leave some time for the services to start
         yield Environment(
             name="local",
