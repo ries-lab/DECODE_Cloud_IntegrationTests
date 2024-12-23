@@ -1,6 +1,5 @@
 import dataclasses
 import os
-import subprocess
 import time
 from typing import Any, Generator, cast
 
@@ -30,8 +29,7 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
         raise ValueError("You can only specify one of --local, --dev, or --prod")
 
     if local:
-        # docker.compose.up(detach=True)
-        subprocess.check_output(["docker-compose", "up", "-d"])  # temp, see outputs
+        docker.compose.up(detach=True)
         time.sleep(30)  # leave some time for the services to start
         yield Environment(
             name="local",

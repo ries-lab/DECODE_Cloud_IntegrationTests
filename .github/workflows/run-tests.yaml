@@ -69,6 +69,7 @@ jobs:
                 cd ../DECODE_Cloud_UserFrontend
                 git checkout ${{ github.event.inputs.frontend_branch }}
                 cd $PWD
+                mkdir ./job_fetcher_data
             - name: Run tests
               env:
                 COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
