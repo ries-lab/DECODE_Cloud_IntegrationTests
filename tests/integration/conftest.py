@@ -1,5 +1,6 @@
 import dataclasses
 import os
+import subprocess
 import time
 from typing import Any, Generator, cast
 
@@ -30,7 +31,7 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
 
     if local:
         # docker.compose.up(detach=True)
-        os.system("docker-compose up -d")  # temp, see outputs
+        subprocess.check_output(["docker-compose", "up", "-d"])  # temp, see outputs
         time.sleep(30)  # leave some time for the services to start
         yield Environment(
             name="local",
