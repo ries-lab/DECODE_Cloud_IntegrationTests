@@ -98,7 +98,7 @@ jobs:
                 fi
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
-                if $ENVIRONMENT == "--local"; then
+                if [ $ENVIRONMENT == "--local" ]; then
                     docker-compose up -d
                 fi
 
@@ -109,6 +109,6 @@ jobs:
                     poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD
                 fi
 
-                if $ENVIRONMENT == "--local"; then
+                if [ $ENVIRONMENT == "--local"] ; then
                     docker-compose down
                 fi
