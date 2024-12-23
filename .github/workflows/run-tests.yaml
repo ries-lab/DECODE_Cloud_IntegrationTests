@@ -73,6 +73,8 @@ jobs:
                 mkdir ./job_fetcher_data
             - name: Run tests
               env:
+                AWS_ACCESS_KEY_ID: ${{ secrets.TESTS_AWS_ACCESS_KEY_ID }}
+                AWS_SECRET_ACCESS_KEY: ${{ secrets.TESTS_AWS_SECRET_ACCESS_KEY }}
                 COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
                 COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
                 COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
