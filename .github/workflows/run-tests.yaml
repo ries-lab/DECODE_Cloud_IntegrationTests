@@ -55,10 +55,11 @@ jobs:
             - name: Clone repositories and checkout branches
               if: ${{ github.event_name == 'dispatch' }}
               run: |
-                git clone https://github.com/ries-lab/DECODE_Cloud_UserAPI.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_WorkerAPI.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_JobFetcher.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_UserFrontend.git ..
+                PWD=$(pwd)
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserAPI.git ../DECODE_Cloud_UserAPI
+                git clone https://github.com/ries-lab/DECODE_Cloud_WorkerAPI.git ../DECODE_Cloud_WorkerAPI
+                git clone https://github.com/ries-lab/DECODE_Cloud_JobFetcher.git ../DECODE_Cloud_JobFetcher
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserFrontend.git ../DECODE_Cloud_UserFrontend
                 cd ../DECODE_Cloud_UserAPI
                 git checkout ${{ github.event.inputs.userfacing_api_branch }}
                 cd ../DECODE_Cloud_WorkerAPI
@@ -67,6 +68,7 @@ jobs:
                 git checkout ${{ github.event.inputs.jobfetcher_branch }}
                 cd ../DECODE_Cloud_UserFrontend
                 git checkout ${{ github.event.inputs.frontend_branch }}
+                cd $PWD
             - name: Run tests
               env:
                 COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
