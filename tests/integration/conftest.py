@@ -29,14 +29,17 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
         raise ValueError("You can only specify one of --local, --dev, or --prod")
 
     if local:
-        docker.compose.up(detach=True)
-        time.sleep(30)  # leave some time for the services to start
+        docker_compose = os.getenv("GITHUB_ACTIONS") is None
+        if docker_compose:
+            docker.compose.up(detach=True)
+            time.sleep(30)  # leave some time for the services to start
         yield Environment(
             name="local",
             userfacing_api_url="http://localhost:8000",
             workerfacing_api_url="http://localhost:8001",
         )
-        docker.compose.down()
+        if docker_compose:
+            docker.compose.down()
     elif dev:
         yield Environment(
             name="dev",

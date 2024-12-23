@@ -96,11 +96,17 @@ jobs:
                         CLOUD=""
                     fi
                 fi
-                ENVIRONMENT=--${{ github.event.inputs.environment }}
+                ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
+
+                if $ENVIRONMENT == "--local"; then
+                    docker-compose up -d
 
                 if [ ${{ github.event_name == 'schedule' }} ]; then
                     poetry run pytest tests/ $ENVIRONMENT --cloud
                     poetry run pytest tests/ $ENVIRONMENT --cloud --gpu
                 else
-                    poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD -vv
+                    poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD
                 fi
+
+                if $ENVIRONMENT == "--local"; then
+                    docker-compose down
