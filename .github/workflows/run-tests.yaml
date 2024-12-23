@@ -99,3 +99,4 @@ jobs:
                     poetry run pytest tests/ $ENVIRONMENT --cloud --gpu
                 else
                     poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD
+                fi
