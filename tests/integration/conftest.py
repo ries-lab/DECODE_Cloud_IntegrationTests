@@ -55,7 +55,10 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
 
 @pytest.fixture(scope="session")
 def use_gpu(pytestconfig: pytest.Config) -> bool:
-    return cast(bool, pytestconfig.getoption("gpu"))
+    gpu = cast(bool, pytestconfig.getoption("gpu"))
+    if gpu:
+        raise NotImplementedError("GPU tests are not implemented yet")
+    return gpu
 
 
 @pytest.fixture(scope="session")

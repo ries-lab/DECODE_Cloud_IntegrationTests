@@ -13,10 +13,6 @@ on:
                 - prod
                 - dev
                 - local
-            gpu:
-                type: boolean
-                description: 'Run job(s) on GPU'
-                default: false
             cloud:
                 type: boolean
                 description: 'Run job(s) with cloud worker'
@@ -53,12 +49,13 @@ jobs:
             - name: Install dependencies
               run: poetry install
             - name: Clone repositories and checkout branches
-              if: ${{ github.event_name == 'dispatch' }}
+              if: ${{ github.event.inputs.environment == 'local' }}
               run: |
-                git clone https://github.com/ries-lab/DECODE_Cloud_UserAPI.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_WorkerAPI.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_JobFetcher.git ..
-                git clone https://github.com/ries-lab/DECODE_Cloud_UserFrontend.git ..
+                PWD=$(pwd)
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserAPI.git ../DECODE_Cloud_UserAPI
+                git clone https://github.com/ries-lab/DECODE_Cloud_WorkerAPI.git ../DECODE_Cloud_WorkerAPI
+                git clone https://github.com/ries-lab/DECODE_Cloud_JobFetcher.git ../DECODE_Cloud_JobFetcher
+                git clone https://github.com/ries-lab/DECODE_Cloud_UserFrontend.git ../DECODE_Cloud_UserFrontend
                 cd ../DECODE_Cloud_UserAPI
                 git checkout ${{ github.event.inputs.userfacing_api_branch }}
                 cd ../DECODE_Cloud_WorkerAPI
@@ -67,8 +64,13 @@ jobs:
                 git checkout ${{ github.event.inputs.jobfetcher_branch }}
                 cd ../DECODE_Cloud_UserFrontend
                 git checkout ${{ github.event.inputs.frontend_branch }}
+                cd $PWD
+                mkdir ~/.aws
+                mkdir ./job_fetcher_data
             - name: Run tests
               env:
+                AWS_ACCESS_KEY_ID: ${{ secrets.TESTS_AWS_ACCESS_KEY_ID }}
+                AWS_SECRET_ACCESS_KEY: ${{ secrets.TESTS_AWS_SECRET_ACCESS_KEY }}
                 COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
                 COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
                 COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
@@ -81,21 +83,14 @@ jobs:
                 touch .env
 
                 if [ ${{ github.event_name == 'dispatch' }} ]; then
-                    if [ ${{ github.event.inputs.gpu }} == true ]; then
-                        GPU=--gpu
-                    else
-                        GPU=""
-                    fi
                     if [ ${{ github.event.inputs.cloud }} == true ]; then
                         CLOUD=--cloud
                     else
                         CLOUD=""
                     fi
-                fi
-                ENVIRONMENT=--${{ github.event.inputs.environment }}
-
-                if [ ${{ github.event_name == 'schedule' }} ]; then
-                    poetry run pytest tests/ $ENVIRONMENT --cloud
-                    poetry run pytest tests/ $ENVIRONMENT --cloud --gpu
                 else
-                    poetry run pytest tests/ $ENVIRONMENT $GPU $CLOUD
+                    CLOUD="--cloud"
+                fi
+                ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
+
+                poetry run pytest tests/ $ENVIRONMENT $CLOUD
