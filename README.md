@@ -13,11 +13,6 @@ The resources are either already deployed (`--dev` or `--prod`), or deployed loc
 **Execution modes**:
  * Locally (requires docker-compose): `poetry install`; `cp .env.example .env` and fill out appropriately; `poetry run pytest tests/ <options>`
  * Using the Github `Run tests` action
- * Configuration (environment variables in `.env`)
-   * `API_URL`
-   * `ID_TOKEN` to login, or `EMAIL` and `PASSWORD` if the user-facing API exposes endpoint `POST /token`
-   * `DEVICE="cpu"` if the worker does not have a GPU
-   * `ENVIRONMENT="cloud"` if testing with a cloud worker, else `"local"`
 
 **Execution environments**:
  * Local (`--local`): locally deployed services using `docker-compose.yaml`
