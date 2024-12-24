@@ -29,17 +29,14 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
         raise ValueError("You can only specify one of --local, --dev, or --prod")
 
     if local:
-        docker_compose = os.getenv("GITHUB_ACTIONS") is None
-        if docker_compose:
-            docker.compose.up(detach=True)
-            time.sleep(30)  # leave some time for the services to start
+        docker.compose.up(detach=True)
+        time.sleep(30)  # leave some time for the services to start
         yield Environment(
             name="local",
             userfacing_api_url="http://localhost:8000",
             workerfacing_api_url="http://localhost:8001",
         )
-        if docker_compose:
-            docker.compose.down()
+        docker.compose.down()
     elif dev:
         yield Environment(
             name="dev",
@@ -58,7 +55,10 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
 
 @pytest.fixture(scope="session")
 def use_gpu(pytestconfig: pytest.Config) -> bool:
-    return cast(bool, pytestconfig.getoption("gpu"))
+    gpu = cast(bool, pytestconfig.getoption("gpu"))
+    if gpu:
+        raise NotImplementedError("GPU tests are not implemented yet")
+    return gpu
 
 
 @pytest.fixture(scope="session")
