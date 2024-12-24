@@ -1,16 +1,31 @@
 # DECODE_Cloud_IntegrationTests
 Integration tests for [DECODE OpenCloud](https://github.com/ries-lab/DECODE_Cloud_Documentation).
 
-**Requires**:
- * Deployed backed (typically through [AWS infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
+**Requirements**:
+ * Deployed backend (e.g. through [AWS infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
    * [User-facing](https://github.com/ries-lab/DECODE_Cloud_UserAPI) and [worker-facing]((https://github.com/ries-lab/DECODE_Cloud_WorkerAPI)) APIs
    * Worker pulling and working on jobs (e.g. cloud worker [on AWS](https://github.com/ries-lab/DECODE_AWS_Infrastructure), or [local worker](https://github.com/ries-lab/DECODE_Cloud_JobFetcher))
    * Application `decode` with version `v0_10_1` and entrypoint `train` (see [DECODE_AWS_Infrastructure](https://github.com/ries-lab/DECODE_AWS_Infrastructure))
+ * [Optional] Linked frontend ([frontend](https://github.com/ries-lab/DECODE_Cloud_UserFrontend))
+ * A user in the Cognito user pool used by the APIs
+The resources are either already deployed (`--dev` or `--prod`), or deployed locally automatically (`--local`).
+
+**Execution modes**:
+ * Locally (requires docker-compose): `poetry install`; `cp .env.example .env` and fill out appropriately; `poetry run pytest tests/ <options>`
+ * Using the Github `Run tests` action
  * Configuration (environment variables in `.env`)
    * `API_URL`
    * `ID_TOKEN` to login, or `EMAIL` and `PASSWORD` if the user-facing API exposes endpoint `POST /token`
    * `DEVICE="cpu"` if the worker does not have a GPU
    * `ENVIRONMENT="cloud"` if testing with a cloud worker, else `"local"`
+
+**Execution environments**:
+ * Local (`--local`): locally deployed services using `docker-compose.yaml`
+ * Dev (`--dev`): services deployed on AWS dev stack
+ * Prod (`--prod`): services deployed on AWS prod stack
+
+**Worker configuration**:  
+Use `--cloud` to run the test jobs on cloud (AWS) workers.
 
 **Test flow**:
  * [Gets ID token to authenticate.]
