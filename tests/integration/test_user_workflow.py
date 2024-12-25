@@ -281,6 +281,24 @@ class _TestApplicationWorkflow(abc.ABC):
         )
         resp.raise_for_status()
 
+    @pytest.mark.order10
+    def test_delete_everything(
+        self,
+        environment: Environment,
+        headers: dict[str, str],
+        experiment_unique_id: str,
+    ) -> None:
+        for file_type in ["config", "data", "artifact", "output", "log"]:
+            requests.delete(
+                f"{environment.userfacing_api_url}/files/{file_type}/{experiment_unique_id}/",
+                headers=headers,
+            )
+            resp = requests.get(
+                f"{environment.userfacing_api_url}/files/{file_type}/{experiment_unique_id}/",
+                headers=headers,
+            )
+            assert resp.status_code == 404
+
 
 class TestDecodeStableWorkflow(_TestApplicationWorkflow):
     @pytest.fixture(scope="class")

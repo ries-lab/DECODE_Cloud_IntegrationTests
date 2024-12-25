@@ -13,6 +13,10 @@ on:
                 - prod
                 - dev
                 - local
+            gpu:
+                type: boolean
+                description: 'Run job(s) with GPU (only supported in non-local environments)'
+                default: false
             cloud:
                 type: boolean
                 description: 'Run job(s) with cloud worker'
@@ -88,8 +92,14 @@ jobs:
                     else
                         CLOUD=""
                     fi
+                    if [ ${{ github.event.inputs.gpu }} == true ]; then
+                        GPU=--gpu
+                    else
+                        GPU=""
+                    fi
                 else
                     CLOUD="--cloud"
+                    GPU="--gpu"
                 fi
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
