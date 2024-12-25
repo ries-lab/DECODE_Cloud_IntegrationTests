@@ -80,7 +80,7 @@ services:
     volumes:
       - ~/.aws/credentials/:/home/app/.aws/credentials
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./job_fetcher_data:/data
+      - ./job_fetcher_data/:/data
     env_file: .env
     environment:
       - API_URL=http://workerfacing-api:8001
