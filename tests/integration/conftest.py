@@ -54,10 +54,12 @@ def environment(pytestconfig: pytest.Config) -> Generator[Environment, Any, None
 
 
 @pytest.fixture(scope="session")
-def use_gpu(pytestconfig: pytest.Config) -> bool:
+def use_gpu(pytestconfig: pytest.Config, environment: Environment) -> bool:
     gpu = cast(bool, pytestconfig.getoption("gpu"))
-    if gpu:
-        raise NotImplementedError("GPU tests are not implemented yet")
+    if gpu and environment.name == "local":
+        # difficulty: need to pass the GPU to the docker-compose file
+        # only if a GPU is available on the host (e.g., not on GH Actions)
+        raise NotImplementedError("Local GPU tests are not implemented yet")
     return gpu
 
 

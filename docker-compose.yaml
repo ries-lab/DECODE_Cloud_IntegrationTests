@@ -11,26 +11,19 @@ services:
       - 8000:8000
     volumes:
       - ~/.aws/credentials:/home/app/.aws/credentials
+      - ./user_data:/user_data
     env_file: .env
     environment:
       - AUTH=1
       - FILESYSTEM=local
-      - S3_BUCKET=
-      - S3_REGION=
-      - USER_DATA_ROOT_PATH=./user_data
+      - USER_DATA_ROOT_PATH=/user_data
       - DATABASE_URL=sqlite:///./sql_app.db
-      - DATABASE_SECRET=
       - WORKERFACING_API_URL=http://workerfacing-api:8001
       - INTERNAL_API_KEY_SECRET=not-secret
       - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
       - COGNITO_REGION=${COGNITO_REGION}
       - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
       - COGNITO_SECRET=${COGNITO_SECRET}
-      - APPLICATION_CONFIG_FILE=
-      - EMAIL_SENDER_SERVICE=
-      - EMAIL_SENDER_ADDRESS=
-      - EMAIL_SENDER_API_KEY=
-      - EMAIL_SENDER_SECRET_KEY=
       - FRONTEND_URL="http://frontend:8080"
 
   workerfacing-api:
@@ -45,18 +38,16 @@ services:
       - 8001:8001
     volumes:
       - ~/.aws/credentials:/home/app/.aws/credentials
+      - ./user_data:/user_data
     env_file: .env
     environment:
       - HOST=0.0.0.0
       - PORT=8001
       - IS_PROD=0
       - FILESYSTEM=local
-      - S3_BUCKET=
-      - S3_REGION=
-      - USER_DATA_ROOT_PATH=./user_data
+      - USER_DATA_ROOT_PATH=/user_data
       - QUEUE_DB_URL=sqlite:///./sql_queue.db
-      - QUEUE_DB_SECRET=
-      - MAX_RETRIES=2
+      - MAX_RETRIES=1
       - TIMEOUT_FAILURE=300
       - RETRY_DIFFERENT=1
       - USERFACING_API_URL=http://userfacing-api:8000
@@ -97,9 +88,7 @@ services:
       - USERNAME=${EMAIL}
       - PASSWORD=${PASSWORD}
       - PATH_BASE=/data
-      - PATH_HOST_BASE=./job_fetcher_data
-      - TIMEOUT_JOB=30
-      - TIMEOUT_STATUS=30
+      - PATH_HOST_BASE=${PWD}/job_fetcher_data
     # deploy:
     #   resources:
     #     reservations:
