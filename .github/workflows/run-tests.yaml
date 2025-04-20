@@ -1,14 +1,16 @@
-name: Run tests
+name: Run tests ${{ github.event_name == 'schedule' && '(Scheduled)' || '(Manual)' }} - ${{ github.event.inputs.environment || 'prod' }}${{ github.event.inputs.cloud && ' (cloud worker)' || '' }}${{ github.event_name == 'schedule' && (github.event.schedule.cron == '0 2 * * 0' && ' (cloud worker)' || ''}}
 
 on:
     schedule:
-        - cron: '0 0 * * 0'  # weekly
+        # Weekly: once with local worker, once with cloud worker
+        - cron: '0 0 * * 0'  # local worker
+        - cron: '0 2 * * 0'  # cloud worker
     workflow_dispatch:
         inputs:
             environment:
                 type: choice
                 description: 'Environment'
-                default: 'production'
+                default: 'prod'
                 options:
                 - prod
                 - dev
@@ -86,6 +88,13 @@ jobs:
               run: |
                 touch .env
 
+                if [ ${{ github.event_name == 'schedule' }} ]; then
+                    if [ "${{ github.event.schedule.cron }}" == "0 2 * * 0" ]; then
+                        CLOUD="--cloud"
+                    else
+                        CLOUD=""
+                    fi
+                    GPU="--gpu"
                 if [ ${{ github.event_name == 'dispatch' }} ]; then
                     if [ ${{ github.event.inputs.cloud }} == true ]; then
                         CLOUD=--cloud
@@ -97,10 +106,6 @@ jobs:
                     else
                         GPU=""
                     fi
-                else
-                    CLOUD="--cloud"
-                    GPU="--gpu"
-                fi
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
                 poetry run pytest tests/ $ENVIRONMENT $CLOUD
