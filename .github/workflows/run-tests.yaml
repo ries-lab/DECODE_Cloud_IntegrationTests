@@ -1,4 +1,4 @@
-name: Run tests ${{ github.event_name == 'schedule' && '(Scheduled)' || '(Manual)' }} - ${{ github.event.inputs.environment || 'prod' }}${{ github.event.inputs.cloud && ' (cloud worker)' || '' }}${{ github.event_name == 'schedule' && (github.event.schedule.cron == '0 2 * * 0' && ' (cloud worker)' || ''}}
+name: Run tests
 
 on:
     schedule:
@@ -95,6 +95,7 @@ jobs:
                         CLOUD=""
                     fi
                     GPU="--gpu"
+                fi
                 if [ ${{ github.event_name == 'dispatch' }} ]; then
                     if [ ${{ github.event.inputs.cloud }} == true ]; then
                         CLOUD=--cloud
@@ -106,6 +107,12 @@ jobs:
                     else
                         GPU=""
                     fi
+                fi
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
-                poetry run pytest tests/ $ENVIRONMENT $CLOUD
+                echo "## 🧪 Test Configuration" >> $GITHUB_STEP_SUMMARY
+                echo "**Environment**: \`$ENVIRONMENT_VALUE\`" >> $GITHUB_STEP_SUMMARY
+                echo "**GPU enabled**: \`$GPU_ENABLED\`" >> $GITHUB_STEP_SUMMARY
+                echo "**Cloud worker**: \`$CLOUD_ENABLED\`" >> $GITHUB_STEP_SUMMARY
+
+                poetry run pytest tests/ $ENVIRONMENT $CLOUD $GPU
