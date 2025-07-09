@@ -5,6 +5,7 @@ description = "Integration tests for DECODE OpenCloud."
 authors = ["Arthur Jaques <arthur.jaques@hispeed.ch>"]
 readme = "README.md"
 package-mode = false
+requires-poetry = "2.1.3"
 
 [tool.poetry.dependencies]
 python = "3.11.10"
@@ -26,7 +27,7 @@ pyyaml = "^6.0.2"
 types-pyyaml = "^6.0.12.20241221"
 
 [build-system]
-requires = ["poetry-core=1.8.4"]
+requires = ["poetry-core==1.9.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff.lint]
