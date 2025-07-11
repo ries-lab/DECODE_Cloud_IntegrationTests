@@ -60,3 +60,6 @@ This is not possible with locally deployed services.
  * Downloads the output `param_run_in.yaml` (2-step pre-signed url, get from pre-signed url), checks that a `.pt` file is present in the output.
  * Deletes the ran job.
  * Deletes the input/output files of the job.
+
+## Cleanup
+Run `poetry run docker-cleanup` to clean-up the space taken up by docker for these tests.
