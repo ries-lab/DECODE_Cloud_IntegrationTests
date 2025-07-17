@@ -110,7 +110,15 @@ jobs:
 
                 echo "## 🧪 Test Configuration" >> $GITHUB_STEP_SUMMARY
                 echo "**Environment**: \`$ENVIRONMENT\`" >> $GITHUB_STEP_SUMMARY
-                echo "**GPU enabled**: \`$GPU\`" >> $GITHUB_STEP_SUMMARY
-                echo "**Cloud worker**: \`$CLOUD\`" >> $GITHUB_STEP_SUMMARY
+                if [ -n "$GPU" ]; then
+                  echo "**GPU enabled**: \`true\`" >> $GITHUB_STEP_SUMMARY
+                else
+                  echo "**GPU enabled**: \`false\`" >> $GITHUB_STEP_SUMMARY
+                fi
+                if [ -n "$CLOUD" ]; then
+                  echo "**Cloud worker**: \`true\`" >> $GITHUB_STEP_SUMMARY
+                else
+                  echo "**Cloud worker**: \`false\`" >> $GITHUB_STEP_SUMMARY
+                fi
 
                 poetry run pytest tests/ $ENVIRONMENT $CLOUD $GPU
