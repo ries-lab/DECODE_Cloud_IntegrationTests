@@ -3,8 +3,8 @@ name: Run tests
 on:
     schedule:
         # Weekly: once with local worker, once with cloud worker
-        - cron: '0 0 * * 0'  # local worker
-        - cron: '0 2 * * 0'  # cloud worker
+        - cron: '0 0 * * *'  # local worker
+        - cron: '0 2 * * *'  # cloud worker
     workflow_dispatch:
         inputs:
             environment:
@@ -88,31 +88,29 @@ jobs:
               run: |
                 touch .env
 
-                if [ ${{ github.event_name == 'schedule' }} ]; then
-                    if [ "${{ github.event.schedule.cron }}" == "0 2 * * 0" ]; then
-                        CLOUD="--cloud"
-                    else
-                        CLOUD=""
-                    fi
-                    GPU="--gpu"
-                fi
-                if [ ${{ github.event_name == 'dispatch' }} ]; then
-                    if [ ${{ github.event.inputs.cloud }} == true ]; then
-                        CLOUD=--cloud
-                    else
-                        CLOUD=""
-                    fi
-                    if [ ${{ github.event.inputs.gpu }} == true ]; then
-                        GPU=--gpu
-                    else
-                        GPU=""
-                    fi
-                fi
+                CLOUD=""
+                GPU=""
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
+                if [ "${{ github.event_name }}" = "schedule" ]; then
+                  CRON=$(jq -r '.schedule[0].cron' "$GITHUB_EVENT_PATH")
+                  if [ "$CRON" = "0 2 * * *" ]; then
+                    CLOUD="--cloud"
+                  fi
+                  GPU="--gpu"
+                fi
+                if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                  if [ "${{ github.event.inputs.cloud }}" = "true" ]; then
+                    CLOUD="--cloud"
+                  fi
+                  if [ "${{ github.event.inputs.gpu }}" = "true" ]; then
+                    GPU="--gpu"
+                  fi
+                fi
+
                 echo "## 🧪 Test Configuration" >> $GITHUB_STEP_SUMMARY
-                echo "**Environment**: \`$ENVIRONMENT_VALUE\`" >> $GITHUB_STEP_SUMMARY
-                echo "**GPU enabled**: \`$GPU_ENABLED\`" >> $GITHUB_STEP_SUMMARY
-                echo "**Cloud worker**: \`$CLOUD_ENABLED\`" >> $GITHUB_STEP_SUMMARY
+                echo "**Environment**: \`$ENVIRONMENT\`" >> $GITHUB_STEP_SUMMARY
+                echo "**GPU enabled**: \`$GPU\`" >> $GITHUB_STEP_SUMMARY
+                echo "**Cloud worker**: \`$CLOUD\`" >> $GITHUB_STEP_SUMMARY
 
                 poetry run pytest tests/ $ENVIRONMENT $CLOUD $GPU
