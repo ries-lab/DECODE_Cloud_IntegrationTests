@@ -92,20 +92,21 @@ jobs:
                 GPU=""
                 GPU_ENABLED=false
 
-                if [ ${{ github.event_name == 'schedule' }} ]; then
-                    if [ "${{ github.event.schedule.cron }}" == "0 2 * * 0" ]; then
+                if [ "${{ github.event_name }}" = "schedule" ]; then
+                    CRON=$(jq -r '.schedule[0].cron' "$GITHUB_EVENT_PATH")
+                    if [ "$CRON" = "0 2 * * 0" ]; then
                         CLOUD="--cloud"
                         CLOUD_ENABLED=true
                     fi
                     GPU="--gpu"
                     GPU_ENABLED=true
                 fi
-                if [ ${{ github.event_name == 'dispatch' }} ]; then
-                    if [ ${{ github.event.inputs.cloud }} == true ]; then
+                if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    if [ "${{ github.event.inputs.cloud }}" = "true" ]; then
                         CLOUD=--cloud
                         CLOUD_ENABLED=true
                     fi
-                    if [ ${{ github.event.inputs.gpu }} == true ]; then
+                    if [ "${{ github.event.inputs.gpu }}" = "true" ]; then
                         GPU=--gpu
                         GPU_ENABLED=true
                     fi
