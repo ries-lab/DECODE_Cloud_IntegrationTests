@@ -87,31 +87,33 @@ jobs:
                 TEST_PASSWORD: ${{ secrets.PASSWORD }}
               run: |
                 touch .env
+                CLOUD=""
+                CLOUD_ENABLED=false
+                GPU=""
+                GPU_ENABLED=false
 
                 if [ ${{ github.event_name == 'schedule' }} ]; then
                     if [ "${{ github.event.schedule.cron }}" == "0 2 * * 0" ]; then
                         CLOUD="--cloud"
-                    else
-                        CLOUD=""
+                        CLOUD_ENABLED=true
                     fi
                     GPU="--gpu"
+                    GPU_ENABLED=true
                 fi
                 if [ ${{ github.event_name == 'dispatch' }} ]; then
                     if [ ${{ github.event.inputs.cloud }} == true ]; then
                         CLOUD=--cloud
-                    else
-                        CLOUD=""
+                        CLOUD_ENABLED=true
                     fi
                     if [ ${{ github.event.inputs.gpu }} == true ]; then
                         GPU=--gpu
-                    else
-                        GPU=""
+                        GPU_ENABLED=true
                     fi
                 fi
                 ENVIRONMENT=--${{ github.event.inputs.environment || 'prod' }}
 
                 echo "## 🧪 Test Configuration" >> $GITHUB_STEP_SUMMARY
-                echo "**Environment**: \`$ENVIRONMENT_VALUE\`" >> $GITHUB_STEP_SUMMARY
+                echo "**Environment**: \`${{ github.event.inputs.environment || 'prod' }}\`" >> $GITHUB_STEP_SUMMARY
                 echo "**GPU enabled**: \`$GPU_ENABLED\`" >> $GITHUB_STEP_SUMMARY
                 echo "**Cloud worker**: \`$CLOUD_ENABLED\`" >> $GITHUB_STEP_SUMMARY
 
