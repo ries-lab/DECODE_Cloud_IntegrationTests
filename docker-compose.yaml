@@ -78,7 +78,7 @@ services:
     build:
       context: ${JOB_FETCHER_PATH:-../DECODE_Cloud_JobFetcher}
       args:
-        PYTHON_VERSION: 3.11.10
+        PYTHON_VERSION: 3.11.13
     restart: no
     network_mode: host
     volumes:
