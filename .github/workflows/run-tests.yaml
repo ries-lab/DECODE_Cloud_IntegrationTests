@@ -3,8 +3,8 @@ name: Run tests
 on:
     schedule:
         # Weekly: once with local worker, once with cloud worker
-        - cron: '0 0 * * 0'  # local worker
-        - cron: '0 2 * * 0'  # cloud worker
+        - cron: '0 * * * *'
+        - cron: '0 * * * *'
     workflow_dispatch:
         inputs:
             environment:
@@ -94,8 +94,7 @@ jobs:
                 GPU_ENABLED=false
 
                 if [ "${{ github.event_name }}" = "schedule" ]; then
-                    CRON=$(jq -r '.schedule[0].cron' "$GITHUB_EVENT_PATH")
-                    if [ "$CRON" = "0 2 * * 0" ]; then
+                    if [ $((${{ github.run_number }} % 2)) -eq 1 ]; then
                         CLOUD="--cloud"
                         CLOUD_ENABLED=true
                     fi
